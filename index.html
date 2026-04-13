@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HCL Bank</title>
+<style>
+body { background:#020617; color:white; text-align:center; font-family:sans-serif;}
+.box { background:#1e293b; padding:20px; margin:20px auto; width:300px; border-radius:10px;}
+input { margin:5px; padding:10px; width:90%;}
+button { padding:10px; width:95%; background:#22c55e; border:none; color:white;}
+</style>
+</head>
+<body>
+
+<h1>🏦 HCL Bank</h1>
+
+<div class="box">
+<h3>Register</h3>
+<input id="r_name" placeholder="Name">
+<input id="r_email" placeholder="Email">
+<input id="r_pass" placeholder="Password">
+<button onclick="register()">Register</button>
+</div>
+
+<div class="box">
+<h3>Login</h3>
+<input id="l_email" placeholder="Email">
+<input id="l_pass" placeholder="Password">
+<button onclick="login()">Login</button>
+</div>
+
+<p id="msg"></p>
+
+<script>
+function register(){
+fetch("/register",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({name:r_name.value,email:r_email.value,password:r_pass.value})})
+.then(r=>r.json()).then(d=>msg.innerText=d.message||d.error)
+}
+
+function login(){
+fetch("/login",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({email:l_email.value,password:l_pass.value})})
+.then(r=>r.json()).then(d=>{
+if(d.message) window.location="/dashboard";
+else msg.innerText=d.error;
+})
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>HCL Bank</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body {margin:0;font-family:sans-serif;background:#020617;color:white;}
+.navbar {display:flex;justify-content:space-between;padding:15px;background:#111827;}
+.logout {background:red;border:none;padding:8px;color:white;}
+.container {display:grid;grid-template-columns:repeat(3,1fr);gap:20px;padding:20px;}
+.card {background:#1e293b;padding:20px;border-radius:10px;transition:0.3s;}
+.card:hover {transform:translateY(-5px);}
+.bank-card {background:linear-gradient(135deg,#06b6d4,#22c55e);padding:20px;border-radius:12px;}
+input {width:100%;padding:8px;margin-top:5px;}
+button {width:100%;padding:10px;margin-top:10px;background:#22c55e;border:none;color:white;}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+<h2>🏦 HCL Bank</h2>
+<button class="logout" onclick="logout()">Logout</button>
+</div>
+
+<div class="container">
+
+<div class="card">
+<h3>Card</h3>
+<div class="bank-card">
+**** **** **** 1234
+<h2 id="balance">₹0</h2>
+</div>
+</div>
+
+<div class="card">
+<h3>Create Account</h3>
+<button onclick="createAccount()">Create</button>
+</div>
+
+<div class="card">
+<h3>Transfer</h3>
+<input id="from" placeholder="From">
+<input id="to" placeholder="To">
+<input id="amount" placeholder="Amount">
+<button onclick="transfer()">Send</button>
+</div>
+
+</div>
+
+<canvas id="chart" style="width:80%;margin:auto;"></canvas>
+
+<div id="accounts"></div>
+
+<script>
+let chart;
+
+function loadAccounts(){
+fetch("/accounts")
+.then(r=>r.json())
+.then(d=>{
+balance.innerText="₹"+d.total_balance;
+
+let labels=[],data=[];
+let html="";
+
+d.accounts.forEach(a=>{
+labels.push("Acc "+a.account_id);
+data.push(a.balance);
+html+=`<p>Acc ${a.account_id}: ₹${a.balance}</p>`;
+});
+
+accounts.innerHTML=html;
+
+if(chart) chart.destroy();
+chart=new Chart(document.getElementById("chart"),{
+type:'bar',
+data:{labels:labels,datasets:[{label:'Balance',data:data}]}
+});
+});
+}
+
+function createAccount(){
+fetch("/create-account",{method:"POST"})
+.then(()=>loadAccounts());
+}
+
+function transfer(){
+fetch("/transfer",{method:"POST",headers:{"Content-Type":"application/json"},
+body:JSON.stringify({from_account:from.value,to_account:to.value,amount:amount.value})})
+.then(()=>loadAccounts());
+}
+
+function logout(){
+fetch("/logout",{method:"POST"}).then(()=>window.location="/");
+}
+
+loadAccounts();
+</script>
+
+</body>
+</html>
