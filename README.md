@@ -173,12 +173,4 @@ POST /transfer
 
 ---
 
-## ⭐ Contribute
 
-Feel free to fork this repo and improve it!
-
----
-
-## 📜 License
-
-This project is for educational purposes.
